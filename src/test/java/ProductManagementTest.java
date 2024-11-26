@@ -38,4 +38,73 @@ class ProductManagementTest {
         Assertions.assertEquals(product.getCategory(), createdProduct.getCategory());
         Assertions.assertEquals(product.getStock(), createdProduct.getStock());
     }
+
+    @Test
+    void test_update() throws SQLException {
+        // prepare new data
+        Product product = new Product();
+        product.setName("iPhone 16");
+        product.setCategory("Smartphone");
+        product.setPrice(BigDecimal.valueOf(10.5));
+        product.setStock(10);
+
+        ProductManagement productManagement = new ProductManagement();
+        product = productManagement.insert(product).orElseThrow();
+
+        // update inserted data
+        product.setName("IPhone 16");
+        product.setCategory("Smartphone");
+        product.setPrice(BigDecimal.valueOf(15));
+        product.setStock(5);
+
+        // execute
+        Product updatedProduct = productManagement.update(product);
+
+        // verification
+        Assertions.assertEquals(product.getId(), updatedProduct.getId());
+        Assertions.assertEquals(product.getName(), updatedProduct.getName());
+        Assertions.assertEquals(product.getPrice(), updatedProduct.getPrice());
+        Assertions.assertEquals(product.getCategory(), updatedProduct.getCategory());
+        Assertions.assertEquals(product.getStock(), updatedProduct.getStock());
+    }
+
+    @Test
+    void test_delete() throws SQLException {
+        // prepare new data
+        Product product = new Product();
+        product.setName("iPhone 16");
+        product.setCategory("Smartphone");
+        product.setPrice(BigDecimal.valueOf(10.5));
+        product.setStock(10);
+
+        ProductManagement productManagement = new ProductManagement();
+        product = productManagement.insert(product).orElseThrow();
+
+        // execute
+        productManagement.deleteProductById(product.getId());
+
+        Optional<Product> optProduct = productManagement.findById(product.getId());
+        Assertions.assertFalse(optProduct.isEmpty());
+    }
+
+    @Test
+    void test_findById() throws SQLException {
+        // prepare new data
+        Product product = new Product();
+        product.setName("iPhone 16");
+        product.setCategory("Smartphone");
+        product.setPrice(BigDecimal.valueOf(10.5));
+        product.setStock(10);
+
+        ProductManagement productManagement = new ProductManagement();
+        product = productManagement.insert(product).orElseThrow();
+
+        Product productFind = productManagement.findById(product.getId()).orElseThrow();
+
+        Assertions.assertEquals(product.getId(), productFind.getId());
+        Assertions.assertEquals(product.getName(), productFind.getName());
+        Assertions.assertEquals(product.getPrice(), productFind.getPrice());
+        Assertions.assertEquals(product.getCategory(), productFind.getCategory());
+        Assertions.assertEquals(product.getStock(), productFind.getStock());
+    }
 }
