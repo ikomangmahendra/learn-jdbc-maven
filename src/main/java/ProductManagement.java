@@ -1,9 +1,11 @@
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ProductManagement {
 
@@ -11,20 +13,31 @@ public class ProductManagement {
     private static final String USER = "ais";
     private static final String PASSWORD = "mysecretpassword";
 
-    /*public Product insert(Product product) throws SQLException {
+    public Optional<Product> insert(Product product) throws SQLException {
         String sql = "insert into product (name, price, category, stock) values (?, ?, ?, ?)";
-        try (var connection = DriverManager.getConnection(URL, USER, PASSWORD);) {
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, product.get);
-            statement.setInt(2, price);
-            statement.setString(3, category);
-            statement.setInt(4, stock);
+        try (var connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            statement.setString(1, product.getName());
+            statement.setBigDecimal(2, product.getPrice());
+            statement.setString(3, product.getCategory());
+            statement.setInt(4, product.getStock());
 
-            var result = statement.executeUpdate();
-            System.out.println(result);
+            int rowAffected = statement.executeUpdate();
+            if (rowAffected > 0) {
+                try (var generatedKeys = statement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        product.setId(generatedKeys.getLong(1));
+                        return Optional.of(product);
+                    } else {
+                        throw new SQLException("Failed to retrieve product ID");
+                    }
+                }
+            } else {
+                throw new SQLException("Failed to insert product");
+            }
         }
     }
-*/
+
     public List<Product> getAll() throws SQLException {
         List<Product> products = new ArrayList<>();
         try (var connection = DriverManager.getConnection(URL, USER, PASSWORD);) {
