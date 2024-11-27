@@ -14,6 +14,9 @@ public class ProductManagement {
     private static final String PASSWORD = "mysecretpassword";
 
     public Optional<Product> insert(Product product) throws SQLException {
+        // validate data
+        ProductValidator.validator(product);
+
         String sql = "insert into product (name, price, category, stock, status) values (?, ?, ?, ?, ?)";
         try (var connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -36,6 +39,8 @@ public class ProductManagement {
     }
 
     public Product update(Product product) throws SQLException {
+        ProductValidator.validator(product);
+
         String sql = "update product set name=?, price=?, category=?, stock=?, status=? where id=?";
         try (var connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             PreparedStatement statement = connection.prepareStatement(sql);

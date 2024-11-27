@@ -51,6 +51,33 @@ class ProductManagementTest {
     }
 
     @Test
+    void test_insert_invalidName() {
+        InvalidDataException exception = assertThrows(InvalidDataException.class, () -> {
+            // Code that should throw the exception
+
+            Product product = new Product();
+            new ProductManagement().insert(product);
+        });
+
+        // Optionally, verify the exception message
+        assertEquals("Invalid data field: Product name", exception.getMessage());
+    }
+
+    @Test
+    void test_insert_invalidPrice() {
+        InvalidDataException exception = assertThrows(InvalidDataException.class, () -> {
+            // Code that should throw the exception
+
+            Product product = new Product();
+            product.setName("iPhone 16");
+            new ProductManagement().insert(product);
+        });
+
+        // Optionally, verify the exception message
+        assertEquals("Invalid data field: Product price", exception.getMessage());
+    }
+
+    @Test
     void test_update() throws SQLException {
         // prepare new data
         Product product = new Product();
