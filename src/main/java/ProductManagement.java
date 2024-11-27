@@ -14,13 +14,10 @@ public class ProductManagement {
     private static final String PASSWORD = "mysecretpassword";
 
     public Optional<Product> insert(Product product) throws SQLException {
-        String sql = "insert into product (name, price, category, stock) values (?, ?, ?, ?)";
+        String sql = "insert into product (name, price, category, stock, status) values (?, ?, ?, ?, ?)";
         try (var connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            statement.setString(1, product.getName());
-            statement.setBigDecimal(2, product.getPrice());
-            statement.setString(3, product.getCategory());
-            statement.setInt(4, product.getStock());
+            mappingObjToStatement(product, statement);
 
             int rowAffected = statement.executeUpdate();
             if (rowAffected > 0) {
@@ -39,14 +36,12 @@ public class ProductManagement {
     }
 
     public Product update(Product product) throws SQLException {
-        String sql = "update product set name=?, price=?, category=?, stock=? where id=?";
+        String sql = "update product set name=?, price=?, category=?, stock=?, status=? where id=?";
         try (var connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, product.getName());
-            statement.setBigDecimal(2, product.getPrice());
-            statement.setString(3, product.getCategory());
-            statement.setInt(4, product.getStock());
-            statement.setLong(5, product.getId());
+            mappingObjToStatement(product, statement);
+
+            statement.setLong(6, product.getId());
 
             int rowAffected = statement.executeUpdate();
             if (rowAffected > 0) {
@@ -62,6 +57,7 @@ public class ProductManagement {
         try (var connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setLong(1, id);
+            statement.executeUpdate();
         }
     }
 
@@ -73,13 +69,7 @@ public class ProductManagement {
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                Product product = new Product();
-                product.setId(resultSet.getLong("id"));
-                product.setName(resultSet.getString("name"));
-                product.setPrice(resultSet.getBigDecimal("price"));
-                product.setCategory(resultSet.getString("category"));
-                product.setStock(resultSet.getInt("stock"));
-
+                Product product = mappingResultSetToObj(resultSet);
                 return Optional.of(product);
             }
         }
@@ -93,17 +83,33 @@ public class ProductManagement {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("select * from product");
             while (resultSet.next()) {
-                Product product = new Product();
-                product.setId(resultSet.getLong("id"));
-                product.setName(resultSet.getString("name"));
-                product.setPrice(resultSet.getBigDecimal("price"));
-                product.setCategory(resultSet.getString("category"));
-                product.setStock(resultSet.getInt("stock"));
-
+                Product product = mappingResultSetToObj(resultSet);
                 products.add(product);
             }
         }
 
         return products;
+    }
+
+    private Product mappingResultSetToObj(ResultSet resultSet) throws SQLException {
+        Product product = new Product();
+        product.setId(resultSet.getLong("id"));
+        product.setName(resultSet.getString("name"));
+        product.setPrice(resultSet.getBigDecimal("price"));
+        product.setCategory(resultSet.getString("category"));
+        product.setStock(resultSet.getInt("stock"));
+
+        ProductStatus status = ProductStatus.valueOf(resultSet.getString("status"));
+        product.setStatus(status);
+
+        return product;
+    }
+
+    private void mappingObjToStatement(Product product, PreparedStatement statement) throws SQLException {
+        statement.setString(1, product.getName());
+        statement.setBigDecimal(2, product.getPrice());
+        statement.setString(3, product.getCategory());
+        statement.setInt(4, product.getStock());
+        statement.setString(5, product.getStatus().name());
     }
 }

@@ -12,7 +12,16 @@ class ProductManagementTest {
 
     @Test
     void test_getAll() throws SQLException {
+        Product product = new Product();
+        product.setName("iPhone 16");
+        product.setCategory("Smartphone");
+        product.setPrice(BigDecimal.valueOf(10.5));
+        product.setStock(10);
+        product.setStatus(ProductStatus.AVAILABLE);
+
         ProductManagement productManagement = new ProductManagement();
+        productManagement.insert(product);
+
         List<Product> results = productManagement.getAll();
         Assertions.assertNotNull(results);
     }
@@ -25,6 +34,7 @@ class ProductManagementTest {
         product.setCategory("Smartphone");
         product.setPrice(BigDecimal.valueOf(10.5));
         product.setStock(10);
+        product.setStatus(ProductStatus.AVAILABLE);
 
         // execute
         ProductManagement productManagement = new ProductManagement();
@@ -37,6 +47,7 @@ class ProductManagementTest {
         Assertions.assertEquals(product.getPrice(), createdProduct.getPrice());
         Assertions.assertEquals(product.getCategory(), createdProduct.getCategory());
         Assertions.assertEquals(product.getStock(), createdProduct.getStock());
+        Assertions.assertEquals(product.getStatus(), createdProduct.getStatus());
     }
 
     @Test
@@ -47,6 +58,7 @@ class ProductManagementTest {
         product.setCategory("Smartphone");
         product.setPrice(BigDecimal.valueOf(10.5));
         product.setStock(10);
+        product.setStatus(ProductStatus.AVAILABLE);
 
         ProductManagement productManagement = new ProductManagement();
         product = productManagement.insert(product).orElseThrow();
@@ -56,6 +68,7 @@ class ProductManagementTest {
         product.setCategory("Smartphone");
         product.setPrice(BigDecimal.valueOf(15));
         product.setStock(5);
+        product.setStatus(ProductStatus.DISCONTINUE);
 
         // execute
         Product updatedProduct = productManagement.update(product);
@@ -66,6 +79,7 @@ class ProductManagementTest {
         Assertions.assertEquals(product.getPrice(), updatedProduct.getPrice());
         Assertions.assertEquals(product.getCategory(), updatedProduct.getCategory());
         Assertions.assertEquals(product.getStock(), updatedProduct.getStock());
+        Assertions.assertEquals(product.getStatus(), updatedProduct.getStatus());
     }
 
     @Test
@@ -76,6 +90,7 @@ class ProductManagementTest {
         product.setCategory("Smartphone");
         product.setPrice(BigDecimal.valueOf(10.5));
         product.setStock(10);
+        product.setStatus(ProductStatus.AVAILABLE);
 
         ProductManagement productManagement = new ProductManagement();
         product = productManagement.insert(product).orElseThrow();
@@ -84,7 +99,7 @@ class ProductManagementTest {
         productManagement.deleteProductById(product.getId());
 
         Optional<Product> optProduct = productManagement.findById(product.getId());
-        Assertions.assertFalse(optProduct.isEmpty());
+        Assertions.assertTrue(optProduct.isEmpty());
     }
 
     @Test
@@ -95,6 +110,7 @@ class ProductManagementTest {
         product.setCategory("Smartphone");
         product.setPrice(BigDecimal.valueOf(10.5));
         product.setStock(10);
+        product.setStatus(ProductStatus.AVAILABLE);
 
         ProductManagement productManagement = new ProductManagement();
         product = productManagement.insert(product).orElseThrow();
@@ -106,5 +122,6 @@ class ProductManagementTest {
         Assertions.assertEquals(product.getPrice(), productFind.getPrice());
         Assertions.assertEquals(product.getCategory(), productFind.getCategory());
         Assertions.assertEquals(product.getStock(), productFind.getStock());
+        Assertions.assertEquals(product.getStatus(), productFind.getStatus());
     }
 }

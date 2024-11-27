@@ -7,6 +7,7 @@ public class Product {
     private BigDecimal price;
     private String category;
     private Integer stock;
+    private ProductStatus status;
 
     public Long getId() {
         return id;
@@ -46,5 +47,13 @@ public class Product {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public ProductStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProductStatus status) {
+        this.status = status;
     }
 }
